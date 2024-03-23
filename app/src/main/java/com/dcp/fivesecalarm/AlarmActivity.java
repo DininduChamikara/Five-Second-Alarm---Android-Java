@@ -2,11 +2,17 @@ package com.dcp.fivesecalarm;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+
+import java.util.Calendar;
 
 public class AlarmActivity extends AppCompatActivity {
 
@@ -40,8 +46,21 @@ public class AlarmActivity extends AppCompatActivity {
     public void snoozeAlarm(View view) {
         // Snooze functionality
         // Implement snooze logic here
-        // For example, you can schedule the alarm to ring again after a certain time
-        // You can use AlarmManager to schedule the alarm again after a specific interval
+        // Stop the alarm sound
+        if (alarmRingtone != null && alarmRingtone.isPlaying()) {
+            alarmRingtone.stop();
+        }
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        // Set the alarm to start after 5 seconds
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, 5);
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
         finish(); // Finish the activity
     }
 }
